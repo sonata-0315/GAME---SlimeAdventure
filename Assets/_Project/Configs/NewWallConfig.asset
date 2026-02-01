@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbbd76202ee423a458194ebd38260234, type: 3}
+  m_Name: NewWallConfig
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Config.wallMechanicConfig
+  SlideSpeed: 3
+  RequireInputToSlide: 0
+  WallJumpForce: 25
+  WallJumpAngle: {x: 1.5, y: 2}
+  WallJumpInputFreezeTimer: 0.2
+  MaxStamina: 100
+  WallJumpCost: 30
+  StaminaRegenRate: 15
+  WallJumpEffect: {fileID: 1877691015447171954, guid: be4d1b4e659874a488cec78436e79628, type: 3}
+  EffectSpawnOffset: 0.5

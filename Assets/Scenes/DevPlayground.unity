@@ -499,6 +499,8 @@ GameObject:
   - component: {fileID: 1123545920}
   - component: {fileID: 1123545925}
   - component: {fileID: 1123545924}
+  - component: {fileID: 1123545927}
+  - component: {fileID: 1123545926}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -682,6 +684,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputActions: {fileID: -944628639613478452, guid: 932936c49057cd940a7ddfac7ada5895, type: 3}
   config: {fileID: 11400000, guid: 36c9626e0119ec74ead3ab51f77bd1bb, type: 2}
+--- !u!114 &1123545926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123545918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9056483ed759cba469f3580871884549, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.DashMechanic
+  _config: {fileID: 11400000, guid: 59703e85c4166b047b618d3236ee7b41, type: 2}
+  _visualRoot: {fileID: 0}
+--- !u!114 &1123545927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123545918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70c74908f7ca5c84bbbcbd60c7a6a670, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.WallMechanic
+  _config: {fileID: 11400000, guid: 382b7ccb05d0e964db3b339995c79670, type: 2}
+  _visualRoot: {fileID: 0}
 --- !u!1 &2004977627
 GameObject:
   m_ObjectHideFlags: 0

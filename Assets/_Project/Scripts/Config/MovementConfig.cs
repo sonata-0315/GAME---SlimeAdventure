@@ -150,22 +150,6 @@ namespace Platformer.Config
         [Range(0f, 0.3f)]
         public float coyoteTime = 0.12f;
 
-        [Header("Dashing")]
-        [Tooltip("The speed of the dash. High value = instant brust.")]
-        [Range(10f, 50f)]
-        public float dashSpeed = 25f;
-
-        [Tooltip("How long the dash lasts in seconds.")]
-        [Range(0.05f, 0.3f)]
-        public float dashDuration = 0.15f;
-
-        [Header("Wall Mechanics")]
-        [Tooltip("Max downward speed when sliding on a wall. Lower = sticker slime.")]
-        [Range(0.1f, 10f)]
-        public float maxWallSlideSpeed = 2f;
-
-        [Tooltip("Force applied when jumping off a wall.")]
-        public Vector2 wallJumpForce = new Vector2(12f, 14f);
         /*
          * ------------------------------------------------------------------------
          * GRAVITY SCALING
