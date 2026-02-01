@@ -76,6 +76,7 @@ namespace Platformer.Player
         /// True if the player is touching ground.
         /// </summary>
         public bool IsGrounded { get; private set; }
+        public bool IsWallSliding { get; private set; }
 
         /// <summary>
         /// Current horizontal velocity.
@@ -103,6 +104,11 @@ namespace Platformer.Player
 
         // Jump state
         private bool isJumping;
+
+        private float dashTimer;
+        private float dashCooldown;
+        private bool isDashing;
+        private Vector2 dashDir;
 
         /*
          * ------------------------------------------------------------------------
@@ -168,7 +174,9 @@ namespace Platformer.Player
             if (config == null || inputReader == null) return;
 
             // Order matters! Ground check first, then movement, then jump
+            UpdateWallState();
             UpdateGroundedState();
+            UpdateDash();
             UpdateHorizontalMovement();
             UpdateJump();
             UpdateGravityScale();
@@ -219,6 +227,21 @@ namespace Platformer.Player
             }
         }
 
+        private void UpdateWallState()
+        {
+            bool touchingLeft = Physics2D.Raycast(transform.position, Vector2.left, 0.6f, config.groundLayer);
+            bool touchingRight = Physics2D.Raycast(transform.position, Vector2.right, 0.6f, config.groundLayer);
+
+            IsWallSliding = (touchingLeft || touchingRight) && !IsGrounded && rb.linearVelocity.y < 0;
+
+            if (IsWallSliding)
+            {
+                //stickyness of Slime: restric the speed of go down
+                float slideSpeed = config.maxWallSlideSpeed;
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -slideSpeed));
+            }
+        }
+
         private bool CheckGrounded()
         {
             if (groundCheckPoint == null) return false;
@@ -250,6 +273,53 @@ namespace Platformer.Player
             if (timeSinceGrounded <= config.coyoteTime) return true;
 
             return false;
+        }
+
+        private void UpdateDash()
+        {
+            if (dashCooldown > 0) dashCooldown -= Time.fixedDeltaTime;
+
+            if (inputReader.DashBuffered && dashCooldown <= 0 && !isDashing)
+            {
+                inputReader.ConsumeDashBuffer();
+                StartDash();
+            }
+
+            if (isDashing)
+            {
+                dashTimer -= Time.fixedDeltaTime;
+
+                rb.linearVelocity = dashDir * config.dashSpeed;
+
+                if (dashTimer <= 0)
+                {
+                    EndDash();
+                }
+            }
+        }
+
+        private void StartDash()
+        {
+            isDashing = true;
+            dashTimer = config.dashDuration;
+            dashCooldown = 0.5f;
+
+            if (inputReader.MoveInput.magnitude > 0.1f)
+            {
+                dashDir = inputReader.MoveInput.normalized;
+            }
+            else
+            {
+                dashDir = HorizontalSpeed >= 0 ? Vector2.right : Vector2.left;
+            }
+
+            dashCooldown = 0.5f;
+        }
+
+        private void EndDash()
+        {
+            isDashing = false;
+            rb.linearVelocity *= 0.5f;
         }
 
         /*
@@ -355,6 +425,19 @@ namespace Platformer.Player
 
         private void UpdateJump()
         {
+            if (inputReader.JumpBuffered)
+            {
+                if (CanJump())
+                {
+                    ExecuteJump();
+                    inputReader.ConsumeJumpBuffer();
+                }
+                else if (IsWallSliding)
+                {
+                    ExecuteWallJump();
+                    inputReader.ConsumeJumpBuffer();
+                }
+            }
             // Check for buffered jump input
             if (inputReader.JumpBuffered && CanJump())
             {
@@ -380,6 +463,16 @@ namespace Platformer.Player
             // Track jump state
             isJumping = true;
             hasJumpedSinceGrounded = true;
+        }
+
+        private void ExecuteWallJump()
+        {
+            bool wallOnLeft = Physics2D.Raycast(transform.position, Vector2.left, 0.6f, config.groundLayer);
+            float jumpDir = wallOnLeft ? 1f : -1f;
+
+            rb.linearVelocity = new Vector2(config.wallJumpForce.x * jumpDir, config.wallJumpForce.y);
+
+            isJumping = true;
         }
 
         /*

@@ -85,12 +85,14 @@ namespace Platformer.Player
         /// Call ConsumeJumpBuffer() when you execute the jump.
         /// </summary>
         public bool JumpBuffered => jumpBufferTimer > 0f;
+        public bool DashBuffered => dashBufferTimer > 0f;
 
         /// <summary>
         /// True while the jump button is held down.
         /// Used for variable jump height (release early = lower jump).
         /// </summary>
         public bool JumpHeld { get; private set; }
+        public bool DashHeld { get; private set; }
 
         /// <summary>
         /// True if currently using a gamepad. False if keyboard/mouse.
@@ -107,9 +109,11 @@ namespace Platformer.Player
         // Input System action references
         private InputAction moveAction;
         private InputAction jumpAction;
+        private InputAction dashAction;
 
         // Input buffering timers
         private float jumpBufferTimer;
+        private float dashBufferTimer;
 
         // Raw input before processing (for debugging)
         private Vector2 rawMoveInput;
@@ -190,11 +194,14 @@ namespace Platformer.Player
 
             moveAction = playerMap.FindAction("Move");
             jumpAction = playerMap.FindAction("Jump");
+            dashAction = playerMap.FindAction("Dash");
 
             if (moveAction == null)
                 Debug.LogError("[InputReader] 'Move' action not found in Player map!", this);
             if (jumpAction == null)
                 Debug.LogError("[InputReader] 'Jump' action not found in Player map!", this);
+            if (dashAction == null)
+                Debug.LogError("[InputReader] 'Dash' action not found in Player map!", this);
         }
 
         private void EnableInputActions()
@@ -204,11 +211,15 @@ namespace Platformer.Player
             // Enable actions so they receive input
             moveAction.Enable();
             jumpAction.Enable();
+            dashAction.Enable();
 
             // Subscribe to jump button events
             // "performed" = button pressed, "canceled" = button released
             jumpAction.performed += OnJumpPerformed;
             jumpAction.canceled += OnJumpCanceled;
+
+            dashAction.performed += OnDashPerformed;
+            dashAction.canceled += OnDashCanceled;
 
             // Track which device is being used
             InputSystem.onActionChange += OnActionChange;
@@ -221,11 +232,16 @@ namespace Platformer.Player
             // Unsubscribe from events (prevents memory leaks)
             jumpAction.performed -= OnJumpPerformed;
             jumpAction.canceled -= OnJumpCanceled;
+
+            dashAction.performed -= OnDashPerformed;
+            dashAction.canceled -= OnDashCanceled;
+
             InputSystem.onActionChange -= OnActionChange;
 
             // Disable actions
             moveAction.Disable();
             jumpAction.Disable();
+            dashAction.Disable();
         }
 
         private void CleanupInputActions()
@@ -343,6 +359,19 @@ namespace Platformer.Player
             JumpHeld = false;
         }
 
+        private void OnDashPerformed(InputAction.CallbackContext context)
+        {
+            DashHeld = true;
+
+            float bufferDuration = config != null ? config.dashBufferDuration : 0.1f;
+            dashBufferTimer = bufferDuration;
+        }
+
+        private void OnDashCanceled(InputAction.CallbackContext context)
+        {
+            DashHeld = false;
+        }
+
         /// <summary>
         /// Call this when you execute a jump to clear the buffer.
         /// Prevents the same input from triggering multiple jumps.
@@ -352,12 +381,22 @@ namespace Platformer.Player
             jumpBufferTimer = 0f;
         }
 
+        public void ConsumeDashBuffer()
+        {
+            dashBufferTimer = 0f;
+        }
+
         private void UpdateBufferTimers()
         {
             // Count down buffer timers
             if (jumpBufferTimer > 0f)
             {
                 jumpBufferTimer -= Time.deltaTime;
+            }
+
+            if (dashBufferTimer > 0f)
+            {
+                dashBufferTimer -= Time.deltaTime;
             }
         }
 
