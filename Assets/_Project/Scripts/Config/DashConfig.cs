@@ -19,6 +19,10 @@ namespace Platformer.Config
         [Tooltip("Time before you can dash again")]
         public float Cooldown = 1.0f;
 
+        [Header("Angle Constraint")]
+        [Tooltip("Vertical Angle constraint")]
+        public float Angle = 1.0f;
+
         [Tooltip("Can dash in air?")]
         public bool AllowAirDash = true;
 

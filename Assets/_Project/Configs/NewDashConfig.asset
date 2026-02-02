@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b2c36e1f53bbc4e986c60817e8e956, type: 3}
   m_Name: NewDashConfig
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Config.DashConfig
-  DashSpeed: 25
-  DashDuration: 0.2
-  PostDashDamping: 0.5
+  DashSpeed: 70
+  DashDuration: 0.11
+  PostDashDamping: 0.2
   Cooldown: 1
+  Angle: 0.4
   AllowAirDash: 1
   DashSquashScale: {x: 1.3, y: 0.7}
   DashEffect: {fileID: 1877691015447171954, guid: be4d1b4e659874a488cec78436e79628, type: 3}

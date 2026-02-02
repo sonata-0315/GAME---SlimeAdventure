@@ -176,7 +176,7 @@ namespace Platformer.Config
 
         [Header("Gravity")]
         [Tooltip("Base gravity scale. 1 = Unity default. Higher = heavier.")]
-        [Range(0.5f, 3f)]
+        [Range(0.5f, 8f)]
         public float gravityScale = 1f;
 
         [Tooltip("Gravity multiplier when falling. Higher = faster fall.")]

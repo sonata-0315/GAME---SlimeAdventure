@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbbd76202ee423a458194ebd38260234, type: 3}
   m_Name: NewWallConfig
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Config.wallMechanicConfig
-  SlideSpeed: 3
+  SlideSpeed: 4
   RequireInputToSlide: 0
   WallJumpForce: 25
   WallJumpAngle: {x: 1.5, y: 2}
-  WallJumpInputFreezeTimer: 0.2
+  WallJumpInputFreezeTimer: 0.03
   MaxStamina: 100
-  WallJumpCost: 30
+  WallJumpCost: 0
   StaminaRegenRate: 15
   WallJumpEffect: {fileID: 1877691015447171954, guid: be4d1b4e659874a488cec78436e79628, type: 3}
   EffectSpawnOffset: 0.5

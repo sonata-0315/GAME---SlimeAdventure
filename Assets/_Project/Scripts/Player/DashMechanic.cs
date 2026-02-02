@@ -15,7 +15,6 @@ namespace Platformer.Mechanics
         [Header("References")]
         [SerializeField] private Transform _visualRoot;
 
-        //Dependence
         private Rigidbody2D _rb;
         private PlayerController _controller;
         private InputReader _input;
@@ -23,6 +22,8 @@ namespace Platformer.Mechanics
         private bool _isDashing;
         private float _lastDashTime;
         private Vector3 _originalScale;
+
+        private float _lastFacingDirection = 1f;
 
         public bool IsDashing => _isDashing;
 
@@ -41,7 +42,12 @@ namespace Platformer.Mechanics
 
         private void Update()
         {
-            if (_input.DashBuffered) //Debug.Log("Dash prepared!")
+            // Update facing direction constantly based on Input
+            if (_input.MoveInput.x != 0)
+            {
+                _lastFacingDirection = Mathf.Sign(_input.MoveInput.x);
+            }
+            
 
             if (_input.DashBuffered && CanDash())
             {
@@ -67,29 +73,52 @@ namespace Platformer.Mechanics
             {
                 Instantiate(_config.DashEffect, transform.position + _config.DashEffectOffset, Quaternion.identity);
             }
-            //no gravity, make sure dash in straight line
+
             float originalGrav = _rb.gravityScale;
             _rb.gravityScale = 0;
 
-            //decide dash direction
-            Vector2 dashDir = _input.MoveInput;
-            if (dashDir == Vector2.zero)
+            
+
+            
+            Vector2 rawInput = _input.MoveInput;
+
+            // Handle "No Input" case -> Dash forward
+            if (rawInput == Vector2.zero)
             {
-                // if direction key is correct, dash to horizontal direction
-                float facing = _rb.linearVelocity.x >= 0 ? 1 : -1;
-                dashDir = new Vector2(facing, 0);
+                rawInput = new Vector2(_lastFacingDirection, 0);
             }
-            dashDir = dashDir.normalized;
+
+            Vector2 dashDir = rawInput.normalized;
+
+            // 2. Clamp the Y component
+            // If the Y component exceeds our limit (e.g., 0.71), we cap it.
+            if (Mathf.Abs(dashDir.y) > _config.Angle)
+            {
+                float signY = Mathf.Sign(dashDir.y);
+                float newY = _config.Angle * signY;
+
+                
+                float newX = Mathf.Sqrt(1 - (newY * newY));
+
+                // Determine X direction:
+                // If the player pressed ANY X direction, use that sign.
+                // If the player pressed PURE UP/DOWN (x=0), use the last facing direction.
+                float signX = (Mathf.Abs(dashDir.x) > 0.01f) ? Mathf.Sign(dashDir.x) : _lastFacingDirection;
+
+                dashDir = new Vector2(newX * signX, newY);
+            }
+
+            
 
             if (_visualRoot != null)
             {
-                Vector3 targetScale = new Vector3(
+                _visualRoot.localScale = new Vector3(
                     _originalScale.x * _config.DashSquashScale.x,
                     _originalScale.y * _config.DashSquashScale.y,
                     1f
-                    );
+                );
             }
-            //this will cover up the playercontroller speed
+
             _rb.linearVelocity = dashDir * _config.DashSpeed;
 
             yield return new WaitForSeconds(_config.DashDuration);
@@ -99,10 +128,9 @@ namespace Platformer.Mechanics
                 _visualRoot.localScale = _originalScale;
             }
 
-            _rb.gravityScale = originalGrav; //gravity back!
-            _rb.linearVelocity *= _config.PostDashDamping; //slow down
+            _rb.gravityScale = originalGrav;
+            _rb.linearVelocity *= _config.PostDashDamping;
             _isDashing = false;
         }
-
     }
 }
