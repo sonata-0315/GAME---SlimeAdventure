@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dd598c171ea05e4b9cd86f40ab99fa1, type: 3}
+  m_Name: NewSplitConfig
+  m_EditorClassIdentifier: 
+  ClonePrefab: {fileID: 7668409764291390413, guid: 498fe919151ef5241a5911003ecde2bd, type: 3}
+  SpawnForce: {x: 5, y: 5}
+  SpawnOffset: {x: 1, y: 0}
+  PlayerShrinkScale: 0.7
+  CloneMass: 100
+  CloneDrag: 5

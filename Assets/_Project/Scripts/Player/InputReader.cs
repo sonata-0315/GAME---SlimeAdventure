@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Platformer.Config;
 using Platformer.Core;
+using UnityEngine.Events;
 
 namespace Platformer.Player
 {
@@ -65,6 +66,8 @@ namespace Platformer.Player
         [Tooltip("Input configuration ScriptableObject for deadzones and buffering.")]
         [SerializeField] private InputConfig config;
 
+        public event UnityAction OpenDexEvent;
+        public event UnityAction SplitEvent;
         /*
          * ------------------------------------------------------------------------
          * INPUT STATE (Read by PlayerController)
@@ -110,6 +113,8 @@ namespace Platformer.Player
         private InputAction moveAction;
         private InputAction jumpAction;
         private InputAction dashAction;
+        private InputAction openDexAction;
+        private InputAction splitAction;
 
         // Input buffering timers
         private float jumpBufferTimer;
@@ -195,6 +200,8 @@ namespace Platformer.Player
             moveAction = playerMap.FindAction("Move");
             jumpAction = playerMap.FindAction("Jump");
             dashAction = playerMap.FindAction("Dash");
+            openDexAction = playerMap.FindAction("OpenDex");
+            splitAction = playerMap.FindAction("Split");
 
             if (moveAction == null)
                 Debug.LogError("[InputReader] 'Move' action not found in Player map!", this);
@@ -212,6 +219,8 @@ namespace Platformer.Player
             moveAction.Enable();
             jumpAction.Enable();
             dashAction.Enable();
+            openDexAction.Enable();
+            splitAction.Enable();
 
             // Subscribe to jump button events
             // "performed" = button pressed, "canceled" = button released
@@ -221,6 +230,8 @@ namespace Platformer.Player
             dashAction.performed += OnDashPerformed;
             dashAction.canceled += OnDashCanceled;
 
+            splitAction.performed += OnSplit;
+            openDexAction.performed += OnOpenDex;
             // Track which device is being used
             InputSystem.onActionChange += OnActionChange;
         }
@@ -236,12 +247,18 @@ namespace Platformer.Player
             dashAction.performed -= OnDashPerformed;
             dashAction.canceled -= OnDashCanceled;
 
+            splitAction.performed -= OnSplit;
+            openDexAction.performed -= OnOpenDex;
+
             InputSystem.onActionChange -= OnActionChange;
 
             // Disable actions
             moveAction.Disable();
             jumpAction.Disable();
             dashAction.Disable();
+            splitAction.Disable();
+            openDexAction.Disable();
+
         }
 
         private void CleanupInputActions()
@@ -370,6 +387,16 @@ namespace Platformer.Player
         private void OnDashCanceled(InputAction.CallbackContext context)
         {
             DashHeld = false;
+        }
+
+        private void OnSplit(InputAction.CallbackContext context)
+        {
+            SplitEvent?.Invoke();
+        }
+
+        private void OnOpenDex(InputAction.CallbackContext context)
+        {
+            OpenDexEvent?.Invoke();
         }
 
         /// <summary>

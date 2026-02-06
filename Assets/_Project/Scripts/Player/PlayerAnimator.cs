@@ -1,5 +1,6 @@
 using UnityEngine;
 using Platformer.Core;
+using Platformer.Mechanics;
 
 namespace Platformer.Player
 {
@@ -55,6 +56,9 @@ namespace Platformer.Player
 
         private Animator animator;
         private PlayerController playerController;
+        private DashMechanic dashMechanic;
+        private WallMechanic wallMechanic;
+        private SplitMechanic splitMechanic;
 
         /*
          * ------------------------------------------------------------------------
@@ -71,6 +75,9 @@ namespace Platformer.Player
         private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
         private static readonly int IsJumpingHash = Animator.StringToHash("IsJumping");
         private static readonly int IsFallingHash = Animator.StringToHash("IsFalling");
+        private static readonly int IsDashingHash = Animator.StringToHash("IsDashing");
+        private static readonly int IsWallSlidingHash = Animator.StringToHash("IsWallSliding");
+        private static readonly int IsSplitHash = Animator.StringToHash("IsSplit");
 
         /*
          * ------------------------------------------------------------------------
@@ -87,6 +94,25 @@ namespace Platformer.Player
         {
             // Get PlayerController - could be on this object or a parent
             playerController = GetComponentInParent<PlayerController>();
+
+            dashMechanic = GetComponentInParent<DashMechanic>();
+            wallMechanic = GetComponent<WallMechanic>();
+            splitMechanic = GetComponent<SplitMechanic>();
+
+            if (dashMechanic == null)
+            {
+                Debug.LogError("Dash Mechanic not found on Player.");
+            }
+
+            if (wallMechanic == null)
+            {
+                Debug.LogError("Wall Mechanic not found on Player.");
+            }
+
+            if (splitMechanic == null)
+            {
+                Debug.LogError("Split Mechanic not found on Player.");
+            }
 
             if (playerController == null)
             {
@@ -111,6 +137,8 @@ namespace Platformer.Player
 
             UpdateMovementParameters();
             UpdateStateParameters();
+
+            UpdateMechanicParameters();
         }
 
         /// <summary>
@@ -143,6 +171,24 @@ namespace Platformer.Player
             animator.SetBool(IsFallingHash, isFalling);
         }
 
+        private void UpdateMechanicParameters()
+        {
+            if (dashMechanic != null)
+            {
+                animator.SetBool(IsDashingHash, dashMechanic.IsDashing);
+            }
+
+            if (wallMechanic != null)
+            {
+                animator.SetBool(IsWallSlidingHash, wallMechanic.IsWallSliding);
+            }
+
+            if (splitMechanic != null)
+            {
+                animator.SetBool(IsSplitHash, splitMechanic.IsSplit);
+            }
+        }
+
         /*
          * ------------------------------------------------------------------------
          * SPRITE FLIPPING
@@ -156,7 +202,12 @@ namespace Platformer.Player
         {
             if (playerController == null) return;
 
-            UpdateFacingDirection();
+            bool isWallSliding = wallMechanic != null && wallMechanic.IsWallSliding;
+
+            if (!isWallSliding)
+            {
+                UpdateFacingDirection();
+            }
         }
 
         private void UpdateFacingDirection()
