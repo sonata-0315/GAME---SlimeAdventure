@@ -363,14 +363,6 @@ namespace Platformer.Player
 
         private void UpdateJump()
         {
-            if (inputReader.JumpBuffered)
-            {
-                if (CanJump())
-                {
-                    ExecuteJump();
-                    inputReader.ConsumeJumpBuffer();
-                }
-            }
             // Check for buffered jump input
             if (inputReader.JumpBuffered && CanJump())
             {

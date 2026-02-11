@@ -15,6 +15,7 @@ namespace Platformer.Mechanics
         [SerializeField] private Transform _visualRoot;
 
         private Rigidbody2D _rb;
+        private Collider2D _collider;
         private PlayerController _controller;
         private InputReader _input;
 
@@ -29,6 +30,7 @@ namespace Platformer.Mechanics
         {
             _controller = GetComponent<PlayerController>();
             _rb = GetComponent<Rigidbody2D>();
+            _collider = GetComponent<Collider2D>();
             _input = ServiceLocator.Get<InputReader>();
 
             if (_visualRoot == null && transform.childCount > 0)
@@ -49,6 +51,7 @@ namespace Platformer.Mechanics
                 _wallJumpLockTimer -= Time.deltaTime;
             }
 
+            //when sliding press jump button counts wall jump
             if (_input.JumpBuffered && _isWallSliding)
             {
                 if (_currentStamina >= _config.WallJumpCost)
@@ -59,6 +62,7 @@ namespace Platformer.Mechanics
                 else
                 {
                     Debug.Log("No Stamina!");
+                    //makes the movement fluent
                     _input.ConsumeJumpBuffer();
                 }
             }
@@ -72,21 +76,27 @@ namespace Platformer.Mechanics
 
         private void CheckWall()
         {
-            float checkDist = 1.0f;
+            //auto caculate the distance from player to the wall
+            float checkDist = _collider.bounds.extents.x + 0.2f;
 
             LayerMask wallLayer = _controller.Config.groundLayer;
 
+            //Raycast test left and right
             bool isTouchinRight = Physics2D.Raycast(transform.position, Vector2.right, checkDist, wallLayer);
             bool isTouchinLeft = Physics2D.Raycast(transform.position, Vector2.left, checkDist, wallLayer);
 
+            //confirmed wall direction
             if (isTouchinRight) _wallDir = 1;
             else if (isTouchinLeft) _wallDir = -1;
             else _wallDir = 0;
 
+            //check if it's sliding
             bool isFalling = _rb.linearVelocity.y < 0;
 
             bool touchingWall = _wallDir != 0;
 
+            //only whern touch wall + not grounded + is falling count as wall sliding
+            //only trigger when it falls down
             _isWallSliding = touchingWall && !_controller.IsGrounded && isFalling;
         }
 
@@ -107,6 +117,7 @@ namespace Platformer.Mechanics
         {
             if (_isWallSliding)
             {
+                //limit the falling speed
                 float currentY = _rb.linearVelocity.y;
                 if (currentY < -_config.SlideSpeed)
                 {
@@ -131,6 +142,7 @@ namespace Platformer.Mechanics
         {
             _currentStamina -= _config.WallJumpCost;
 
+            //caculate the jumping direction
             Vector2 jumpDir = new Vector2(-_wallDir * _config.WallJumpAngle.x, _config.WallJumpAngle.y).normalized;
 
             if (_config.WallJumpEffect != null)
@@ -139,9 +151,9 @@ namespace Platformer.Mechanics
                 Quaternion rotation = Quaternion.LookRotation(new Vector3(-_wallDir, 1, 0));
                 Instantiate(_config.WallJumpEffect, spawnPos, rotation);
             }
-
+            //add force
             _rb.linearVelocity = jumpDir * _config.WallJumpForce;
-
+            //lock input time, incase player go back to the wall immdiately
             _wallJumpLockTimer = _config.WallJumpInputFreezeTimer;
         }
 

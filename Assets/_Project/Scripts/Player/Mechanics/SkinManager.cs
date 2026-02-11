@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Platformer.Config;
 using Platformer.Core;
+using TMPro;
 
 namespace Platformer.Mechanics
 {
@@ -12,6 +13,9 @@ namespace Platformer.Mechanics
 
         [Header("References")]
         [SerializeField] private Animator _playerAnimator;
+
+        [Header("UI Reference")]
+        public TextMeshProUGUI coinText;
 
         public int CurrentCoins { get; private set; } = 0;
         public int UnlockedSkinCount { get; private set; } = 1;
@@ -35,6 +39,7 @@ namespace Platformer.Mechanics
         {
             CurrentCoins++;
             CheckUnlock();
+            UpdateCoinUI();
         }
 
         private void CheckUnlock()
@@ -64,6 +69,14 @@ namespace Platformer.Mechanics
 
                     Debug.Log($"Change to {skinData.SkinName}");
                 }
+            }
+        }
+
+        private void UpdateCoinUI()
+        {
+            if (coinText != null)
+            {
+                coinText.text = "x " + CurrentCoins.ToString();
             }
         }
 

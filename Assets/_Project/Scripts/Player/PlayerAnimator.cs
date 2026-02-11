@@ -174,7 +174,7 @@ namespace Platformer.Player
 
             // Jump/Fall states (derived from velocity and ground state)
             bool isRising = playerController.VerticalSpeed > 0.1f;
-            bool isFalling = playerController.VerticalSpeed < -0.1f && !playerController.IsGrounded;
+            bool isFalling = playerController.VerticalSpeed < -2.0f && !playerController.IsGrounded; //limit the falling animation by speed
 
             animator.SetBool(IsJumpingHash, isRising);
             animator.SetBool(IsFallingHash, isFalling);
