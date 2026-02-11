@@ -72,7 +72,7 @@ namespace Platformer.Mechanics
 
         private void CheckWall()
         {
-            float checkDist = 1.5f;
+            float checkDist = 1.0f;
 
             LayerMask wallLayer = _controller.Config.groundLayer;
 

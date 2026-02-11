@@ -78,7 +78,9 @@ namespace Platformer.Player
         private static readonly int IsDashingHash = Animator.StringToHash("IsDashing");
         private static readonly int IsWallSlidingHash = Animator.StringToHash("IsWallSliding");
         private static readonly int IsSplitHash = Animator.StringToHash("IsSplit");
+        private static readonly int WallJumpTriggerHash = Animator.StringToHash("WallJump");
 
+        private bool _wasWallSliding;
         /*
          * ------------------------------------------------------------------------
          * UNITY LIFECYCLE
@@ -137,9 +139,16 @@ namespace Platformer.Player
 
             UpdateMovementParameters();
             UpdateStateParameters();
-
             UpdateMechanicParameters();
+
+            if (wallMechanic != null)
+            {
+                _wasWallSliding = wallMechanic.IsWallSliding;
+            }
         }
+
+
+
 
         /// <summary>
         /// Updates speed-related animator parameters.
@@ -180,6 +189,13 @@ namespace Platformer.Player
 
             if (wallMechanic != null)
             {
+                bool isWallSliding = wallMechanic.IsWallSliding;
+                bool isJumping = playerController.VerticalSpeed > 0.1f;
+
+                if (_wasWallSliding && !isWallSliding && isJumping)
+                {
+                    animator.SetTrigger(WallJumpTriggerHash);
+                }
                 animator.SetBool(IsWallSlidingHash, wallMechanic.IsWallSliding);
             }
 
