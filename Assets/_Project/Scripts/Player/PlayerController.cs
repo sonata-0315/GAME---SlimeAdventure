@@ -225,10 +225,14 @@ namespace Platformer.Player
         {
             if (groundCheckPoint == null) return false;
 
-            // Cast a ray downward from the ground check point
-            RaycastHit2D hit = Physics2D.Raycast(
+            //Raycast changed to boxcast because Gemini says raycast sucks. It was right, cause it fixed my edges not triggering groundcheck. All Hail Lord Gemini. -NR
+            Vector2 boxSize = new Vector2(0.9f, 0.1f);
+
+            RaycastHit2D hit = Physics2D.BoxCast(
                 groundCheckPoint.position,
-                Vector2.down,
+                boxSize,
+                0f,             
+                Vector2.down,   
                 config.groundCheckDistance,
                 config.groundLayer
             );
@@ -363,14 +367,6 @@ namespace Platformer.Player
 
         private void UpdateJump()
         {
-            if (inputReader.JumpBuffered)
-            {
-                if (CanJump())
-                {
-                    ExecuteJump();
-                    inputReader.ConsumeJumpBuffer();
-                }
-            }
             // Check for buffered jump input
             if (inputReader.JumpBuffered && CanJump())
             {

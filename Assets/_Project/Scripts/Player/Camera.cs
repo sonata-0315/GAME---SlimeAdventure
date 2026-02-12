@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 
 public class Camera : MonoBehaviour
@@ -11,7 +12,40 @@ public class Camera : MonoBehaviour
     public float smoothSpeed = 5f; 
 
     [Header("Offset")]
-    public Vector3 offset = new Vector3(0, 0, -10); 
+    public Vector3 offset = new Vector3(0, 0, -10);
+
+
+    void Start()
+    {
+        // Start the ramp-up routine immediately
+        StartCoroutine(RampCameraSpeed());
+    }
+
+    IEnumerator RampCameraSpeed()
+    {
+        
+        float targetSpeed = smoothSpeed;
+
+        
+        smoothSpeed = 0.02f;
+
+        
+        float duration = 6f;
+        float elapsed = 0f;
+
+       
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+           
+            smoothSpeed = Mathf.Lerp(0.1f, targetSpeed, elapsed / duration);
+
+            yield return null;
+        }
+
+        
+        smoothSpeed = targetSpeed;
+    }
 
     void LateUpdate()
     {

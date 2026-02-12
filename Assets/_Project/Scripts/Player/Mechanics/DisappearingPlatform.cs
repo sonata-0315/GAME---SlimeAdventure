@@ -35,10 +35,11 @@ namespace Platformer.Mechanics
 
             if (collision.gameObject.CompareTag("Player"))
             {
-                //check if player is on the top
                 foreach (ContactPoint2D contact in collision.contacts)
                 {
-                    if (contact.normal.y < -0.5f)
+                    // Condition 1: Player is on top 
+                    // Condition 2: Player is on side
+                    if (contact.normal.y < -0.5f || Mathf.Abs(contact.normal.x) > 0.5f)
                     {
                         StartCoroutine(CrumbleRoutine());
                         break;

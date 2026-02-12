@@ -15,6 +15,7 @@ namespace Platformer.Mechanics
         [SerializeField] private Transform _visualRoot;
 
         private Rigidbody2D _rb;
+        private Collider2D _collider;
         private PlayerController _controller;
         private InputReader _input;
 
@@ -24,11 +25,13 @@ namespace Platformer.Mechanics
         private Vector3 _orginalScale;
         private float _currentStamina;
         public bool IsWallSliding => _isWallSliding;
+        public int WallDir => _wallDir;
 
         private void Start()
         {
             _controller = GetComponent<PlayerController>();
             _rb = GetComponent<Rigidbody2D>();
+            _collider = GetComponent<Collider2D>();
             _input = ServiceLocator.Get<InputReader>();
 
             if (_visualRoot == null && transform.childCount > 0)
@@ -49,6 +52,7 @@ namespace Platformer.Mechanics
                 _wallJumpLockTimer -= Time.deltaTime;
             }
 
+            //when sliding press jump button counts wall jump
             if (_input.JumpBuffered && _isWallSliding)
             {
                 if (_currentStamina >= _config.WallJumpCost)
@@ -59,6 +63,7 @@ namespace Platformer.Mechanics
                 else
                 {
                     Debug.Log("No Stamina!");
+                    //makes the movement fluent
                     _input.ConsumeJumpBuffer();
                 }
             }
@@ -72,22 +77,47 @@ namespace Platformer.Mechanics
 
         private void CheckWall()
         {
-            float checkDist = 1.0f;
+            if (_wallJumpLockTimer > 0)
+            {
+                _isWallSliding = false;
+                return;
+            }
+
+            
+            Vector2 boxSize = new Vector2(0.05f, _collider.bounds.size.y*0.6f);
+
+            // 2. Distance to cast
+            // How far past the collider edge do we check?
+            float castDistance = _collider.bounds.extents.x + 0.2f;
 
             LayerMask wallLayer = _controller.Config.groundLayer;
 
-            bool isTouchinRight = Physics2D.Raycast(transform.position, Vector2.right, checkDist, wallLayer);
-            bool isTouchinLeft = Physics2D.Raycast(transform.position, Vector2.left, checkDist, wallLayer);
+            // 3. Perform BoxCasts (Use bounds.center to be safe)
+            RaycastHit2D hitRight = Physics2D.BoxCast(_collider.bounds.center, boxSize, 0f, Vector2.right, castDistance, wallLayer);
+            RaycastHit2D hitLeft = Physics2D.BoxCast(_collider.bounds.center, boxSize, 0f, Vector2.left, castDistance, wallLayer);
 
-            if (isTouchinRight) _wallDir = 1;
-            else if (isTouchinLeft) _wallDir = -1;
+            // 4. Determine Direction
+            if (hitRight) _wallDir = 1;
+            else if (hitLeft) _wallDir = -1;
             else _wallDir = 0;
 
-            bool isFalling = _rb.linearVelocity.y < 0;
-
+           
             bool touchingWall = _wallDir != 0;
 
-            _isWallSliding = touchingWall && !_controller.IsGrounded && isFalling;
+            _isWallSliding = touchingWall && !_controller.IsGrounded;
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (_collider == null) return;
+
+            Gizmos.color = Color.cyan;
+            // Visualize the right-side check
+            Vector2 boxSize = new Vector2(0.1f, _collider.bounds.size.y * 0.8f);
+            Vector3 center = _collider.bounds.center;
+            // Draw the box at the max cast distance
+            Gizmos.DrawWireCube(center + Vector3.right * (_collider.bounds.extents.x + 0.2f), boxSize);
+            Gizmos.DrawWireCube(center + Vector3.left * (_collider.bounds.extents.x + 0.2f), boxSize);
         }
 
         private void HandleStaminaRegen()
@@ -107,6 +137,7 @@ namespace Platformer.Mechanics
         {
             if (_isWallSliding)
             {
+                //limit the falling speed
                 float currentY = _rb.linearVelocity.y;
                 if (currentY < -_config.SlideSpeed)
                 {
@@ -131,7 +162,9 @@ namespace Platformer.Mechanics
         {
             _currentStamina -= _config.WallJumpCost;
 
+            //caculate the jumping direction
             Vector2 jumpDir = new Vector2(-_wallDir * _config.WallJumpAngle.x, _config.WallJumpAngle.y).normalized;
+
 
             if (_config.WallJumpEffect != null)
             {
@@ -139,9 +172,10 @@ namespace Platformer.Mechanics
                 Quaternion rotation = Quaternion.LookRotation(new Vector3(-_wallDir, 1, 0));
                 Instantiate(_config.WallJumpEffect, spawnPos, rotation);
             }
-
+            _isWallSliding = false;
+            //add force
             _rb.linearVelocity = jumpDir * _config.WallJumpForce;
-
+            //lock input time, incase player go back to the wall immdiately
             _wallJumpLockTimer = _config.WallJumpInputFreezeTimer;
         }
 

@@ -132,8 +132,6 @@ GameObject:
   - component: {fileID: 8921253987947436096}
   - component: {fileID: 5465474984979950283}
   - component: {fileID: 3353687134958259175}
-  - component: {fileID: 4575909722618467759}
-  - component: {fileID: 9194901680618423675}
   - component: {fileID: 1869602100468843720}
   - component: {fileID: 4910184829761565300}
   - component: {fileID: 6287037344405435971}
@@ -282,8 +280,8 @@ BoxCollider2D:
   m_Offset: {x: 0.0019865036, y: 0.50789785}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 6.3999996, y: 3.40625}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 1.92, y: 1.5127757}
     newSize: {x: 1.92, y: 1.5127757}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -319,34 +317,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: b1688ee34559e6f428289922154836ac, type: 2}
   groundCheckPoint: {fileID: 8977847877983244768}
---- !u!114 &4575909722618467759
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9025964048941155726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c74908f7ca5c84bbbcbd60c7a6a670, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.WallMechanic
-  _config: {fileID: 11400000, guid: 382b7ccb05d0e964db3b339995c79670, type: 2}
-  _visualRoot: {fileID: 8977847877983244768}
---- !u!114 &9194901680618423675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9025964048941155726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9056483ed759cba469f3580871884549, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.DashMechanic
-  _config: {fileID: 11400000, guid: 59703e85c4166b047b618d3236ee7b41, type: 2}
-  _visualRoot: {fileID: 8977847877983244768}
 --- !u!114 &1869602100468843720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,6 +378,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _config: {fileID: 11400000, guid: dbcaf11e52cb86e4b82cf3e58dce9165, type: 2}
   _playerAnimator: {fileID: 0}
+  coinText: {fileID: 0}
 --- !u!114 &7211903426515838363
 MonoBehaviour:
   m_ObjectHideFlags: 0

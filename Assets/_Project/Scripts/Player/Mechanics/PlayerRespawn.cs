@@ -15,7 +15,7 @@ namespace Platformer.Mechanics
         private void Start()
         {
             _rb = GetComponent<Rigidbody2D>();
-            //when game start, reocrd this locaton as respawn position
+            //when game start, record this location as respawn position
             _respawnPosition = transform.position;
         }
 
@@ -31,6 +31,7 @@ namespace Platformer.Mechanics
             var col = GetComponent<Collider2D>();
             var controller = GetComponent<PlayerController>();
 
+            controller.enabled = false;
             renderer.enabled = false;
             col.enabled = false;
             _rb.simulated = false;
@@ -40,6 +41,7 @@ namespace Platformer.Mechanics
             transform.position = _respawnPosition;
             _rb.linearVelocity = Vector3.zero;
 
+            controller.enabled = true;
             renderer.enabled = true;
             col.enabled = true;
             _rb.simulated = true;

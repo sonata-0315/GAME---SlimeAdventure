@@ -174,7 +174,7 @@ namespace Platformer.Player
 
             // Jump/Fall states (derived from velocity and ground state)
             bool isRising = playerController.VerticalSpeed > 0.1f;
-            bool isFalling = playerController.VerticalSpeed < -0.1f && !playerController.IsGrounded;
+            bool isFalling = playerController.VerticalSpeed < -2.0f && !playerController.IsGrounded; //limit the falling animation by speed
 
             animator.SetBool(IsJumpingHash, isRising);
             animator.SetBool(IsFallingHash, isFalling);
@@ -218,12 +218,26 @@ namespace Platformer.Player
         {
             if (playerController == null) return;
 
+            // Check if we are sliding and get the direction
             bool isWallSliding = wallMechanic != null && wallMechanic.IsWallSliding;
 
-            if (!isWallSliding)
+            if (isWallSliding)
+            {
+                ForceWallFacingDirection(wallMechanic.WallDir);
+            }
+            else
             {
                 UpdateFacingDirection();
             }
+        }
+
+        private void ForceWallFacingDirection(int direction)
+        {
+            if (direction == 0) return;
+
+            Vector3 scale = transform.localScale;
+            scale.x = direction > 0 ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+            transform.localScale = scale;
         }
 
         private void UpdateFacingDirection()
